@@ -1,13 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from ebay import search_ebay_prices
 import os
 
 load_dotenv()
-
-EBAY_APP_ID = os.getenv("EBAY_APP_ID")
-EBAY_DEV_ID = os.getenv("EBAY_DEV_ID")
-EBAY_CERT_ID = os.getenv("EBAY_CERT_ID")
 
 app = FastAPI()
 
@@ -23,3 +20,15 @@ app.add_middleware(
 @app.get("/")
 def root():
     return {"message": "FlipCheck API is running!"}
+
+@app.get("/search")
+async def search(query: str):
+    results = await search_ebay_prices(query)
+    return {"results": results}
+
+@app.get("/debug")
+def debug():
+    return {
+        "app_id": os.getenv("EBAY_APP_ID"),
+        "cert_id": os.getenv("EBAY_CERT_ID"),
+    }
